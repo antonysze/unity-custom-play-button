@@ -71,7 +71,7 @@ namespace ASze.CustomPlayButton
         public override Vector2 GetWindowSize()
         {
             var width = COLLUMN_WIDTH * (CustomPlayButton.Bookmark.HasBookmark() ? 2 : 1);
-            var maxRow = Mathf.Max(buildScenes.Length, CustomPlayButton.Bookmark.bookmarks.Count);
+            var maxRow = Mathf.Max(buildScenes.Length, CustomPlayButton.Bookmark.bookmarks.Count, 1);
             var height = Mathf.Min(22 * maxRow + 26, Screen.currentResolution.height * 0.5f);
             return new Vector2(width, height);
         }
@@ -111,12 +111,19 @@ namespace ASze.CustomPlayButton
             }
             EditorGUILayout.EndHorizontal();
 
-            scrollPosBuild = EditorGUILayout.BeginScrollView(scrollPosBuild);
-            for (int i = 0; i < buildScenes.Length; i++)
+            if (buildScenes.Length > 0)
             {
-                DrawSelection(buildScenes[i], i, true);
+                scrollPosBuild = EditorGUILayout.BeginScrollView(scrollPosBuild);
+                for (int i = 0; i < buildScenes.Length; i++)
+                {
+                    DrawSelection(buildScenes[i], i, true);
+                }
+                EditorGUILayout.EndScrollView();
             }
-            EditorGUILayout.EndScrollView();
+            else
+            {
+                GUILayout.Label("No scene in build setting");
+            }
             EditorGUILayout.EndVertical();
         }
 
