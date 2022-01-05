@@ -127,7 +127,17 @@ namespace ASze.CustomPlayButton
 
             if (GUILayout.Button(customSceneContent, ToolbarStyles.commandButtonStyle))
             {
-                StartScene(selectedScene);
+                if (selectedScene = null)
+                {
+                    StartScene(selectedScene);
+                }
+                else
+                {
+                    EditorUtility.DisplayDialog(
+                        "Cannot play the scene",
+                        "No scene is selected to play. Please select a scene from the dropdown list.",
+                        "Ok");
+                }
             }
 
             if (GUILayout.Button(gameSceneContent, ToolbarStyles.commandButtonStyle))
