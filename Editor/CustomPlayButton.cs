@@ -165,9 +165,19 @@ namespace ASze.CustomPlayButton
                 if (currentToolbar != null)
                 {
                     var guiViewType = typeof(Editor).Assembly.GetType("UnityEditor.GUIView");
+#if UNITY_2020_1_OR_NEWER
+                    var iWindowBackendType = typeof(Editor).Assembly.GetType("UnityEditor.IWindowBackend");
+                    var guiBackend = guiViewType.GetProperty("windowBackend",
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    var viewVisualTree = iWindowBackendType.GetProperty("visualTree",
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    var windowBackend = guiBackend.GetValue(currentToolbar);
+                    toolbarElement = (VisualElement)viewVisualTree.GetValue(windowBackend, null);
+#else
                     var viewVisualTree = guiViewType.GetProperty("visualTree",
                         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
                     toolbarElement = (VisualElement)viewVisualTree.GetValue(currentToolbar, null);
+#endif
                 }
             }
 
