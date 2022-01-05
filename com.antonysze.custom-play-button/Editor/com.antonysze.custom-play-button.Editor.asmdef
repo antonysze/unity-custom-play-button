@@ -1,0 +1,14 @@
+{
+    "name": "CustomPlayButton",
+    "rootNamespace": "ASze.CustomPlayButton",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
