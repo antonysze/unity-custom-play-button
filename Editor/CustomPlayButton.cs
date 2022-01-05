@@ -130,13 +130,25 @@ namespace ASze.CustomPlayButton
                 StartScene(selectedScene);
             }
 
-            if (EditorBuildSettings.scenes.Length > 0)
+            if (GUILayout.Button(gameSceneContent, ToolbarStyles.commandButtonStyle))
             {
-                if (GUILayout.Button(gameSceneContent, ToolbarStyles.commandButtonStyle))
+                if (EditorBuildSettings.scenes.Length > 0)
                 {
                     var scenePath = EditorBuildSettings.scenes[0].path;
                     var scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
                     StartScene(scene);
+                }
+                else
+                {
+                    if (!EditorUtility.DisplayDialog(
+                        "Cannot play the game",
+                        "Please add the first scene in build setting in order to play the game.",
+                        "Ok", "Open build setting"))
+                    {
+                        EditorWindow.GetWindow(System.Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
+                    }
+                    // Avoid error from GUILayout.EndHorizontal()
+                    GUILayout.BeginHorizontal();
                 }
             }
         }
