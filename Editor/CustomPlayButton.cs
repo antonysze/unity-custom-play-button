@@ -18,7 +18,7 @@ namespace ASze.CustomPlayButton
     {
         const string FOLDER_PATH = "Assets/Editor/CustomPlayButton/";
         const string SETTING_PATH = FOLDER_PATH + "BookmarkSetting.asset";
-        const string ICONS_PATH = "Packages/com.antonysze.custom-play-button/Icons/";
+        const string ICONS_PATH = "Packages/com.antonysze.custom-play-button/Editor/Icons/";
 
         private static SceneBookmark bookmark = null;
         private static SceneAsset selectedScene = null;
