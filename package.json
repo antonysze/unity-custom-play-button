@@ -15,5 +15,7 @@
         "name": "Antony Sze",
         "email": "antonyszex@gmail.com",
         "url": "https://twitter.com/Antony_Sze"
-    }
+    },
+    "changelogUrl": "https://github.com/antonysze/Unity-Custom-Play-Button/blob/main/CHANGELOG.md",
+    "licensesUrl": "https://github.com/antonysze/Unity-Custom-Play-Button/blob/main/LICENSE.md"
 }
