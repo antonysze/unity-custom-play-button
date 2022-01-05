@@ -4,9 +4,6 @@
     "displayName": "Custom Play Button",
     "description": "Extend the Unity Toolbar with custom play button",
     "unity": "2019.1",
-    "dependencies": {
-        "com.marijnzwemmer.unity-toolbar-extender": "https://github.com/marijnz/unity-toolbar-extender.git"
-    },
     "keywords": [
         "toolbar",
         "scene",
