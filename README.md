@@ -1,5 +1,5 @@
 # Unity Custom Play Button
-Add 2 custom play buttons to the Unity Toolbar to avoid keep switching scenes when testing the game. Directly play the game (the first scene in build setting) or specific scene (chose from dropdown list) by clicking those buttons without changing scene. When stop playing, scene will change back to the scene before play.  Additional dropdown list for quick build or bookmarked scenes switching without searching.
+Add 2 custom play buttons to the Unity Toolbar to avoid keep switching scenes when testing the game. Directly play the game (the first scene in build setting) or specific scene (chose from dropdown list) by clicking those buttons without changing scene. When stop playing, scene will change back to the scene before play.  Additional dropdown list for quick build scene or bookmarked scene switching without searching it.
 
 ![image](https://user-images.githubusercontent.com/3353695/148316557-47d93af2-fb9d-46b8-97da-9ce409e02317.png)
 
