@@ -99,7 +99,7 @@ namespace ASze.CustomPlayButton
             if (bookmark == null)
             {
                 bookmark = AssetDatabase.LoadAssetAtPath<SceneBookmark>(SETTING_PATH);
-                bookmark?.RemoveNullValue();
+                Bookmark?.RemoveNullValue();
             }
 
             var savedScenePath = EditorPrefs.GetString(GetEditorPrefKey(), "");
