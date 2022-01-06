@@ -139,7 +139,7 @@ namespace ASze.CustomPlayButton
                 else
                 {
                     EditorUtility.DisplayDialog(
-                        "Cannot play the scene",
+                        "Cannot play custom scene",
                         "No scene is selected to play. Please select a scene from the dropdown list.",
                         "Ok");
                 }
