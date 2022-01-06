@@ -103,8 +103,8 @@ namespace ASze.CustomPlayButton
             }
 
             var savedScenePath = EditorPrefs.GetString(GetEditorPrefKey(), "");
-            SelectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(savedScenePath);
-            if (SelectedScene == null && EditorBuildSettings.scenes.Length > 0)
+            selectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(savedScenePath);
+            if (selectedScene == null && EditorBuildSettings.scenes.Length > 0)
             {
                 var scenePath = EditorBuildSettings.scenes[0].path;
                 SelectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
