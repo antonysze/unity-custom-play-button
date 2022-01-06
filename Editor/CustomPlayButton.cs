@@ -132,7 +132,7 @@ namespace ASze.CustomPlayButton
 
             if (GUILayout.Button(customSceneContent, ToolbarStyles.commandButtonStyle))
             {
-                if (selectedScene = null)
+                if (selectedScene != null)
                 {
                     StartScene(selectedScene);
                 }
