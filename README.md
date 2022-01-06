@@ -14,6 +14,8 @@ You can also install the prerequisite package via popup window after you install
 ![image](https://user-images.githubusercontent.com/3353695/148312273-2188311b-fe3e-4a4b-87ea-00ccaead8aef.png)
 
 ## How to use
+![image](https://user-images.githubusercontent.com/3353695/148320339-2efc85a4-fc4b-44d7-bd84-662ff9e34c52.gif)
+
 ### Play Buttons on Unity Toobar
 ![image](https://user-images.githubusercontent.com/3353695/148315309-e6369f75-5a44-4684-8848-f59341058443.png)
 1. **Dropdown button of custom scene** - open scene selection window
