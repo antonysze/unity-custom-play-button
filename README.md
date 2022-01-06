@@ -7,6 +7,7 @@ Add 2 custom play buttons to the Unity Toolbar to avoid keep switching scenes wh
 Import this from Unity Package Manager. You can [download and import it from your hard drive](https://docs.unity3d.com/Manual/upm-ui-local.html), or [link to it from github directly](https://docs.unity3d.com/Manual/upm-ui-giturl.html).
 
 ## Requirements
+Tested Unity version: 2021 - 2019
 Please make sure following package is installed to make this package works:
 - [unity-toolbar-extender](https://github.com/marijnz/unity-toolbar-extender) - 1.4.1 or above
 
