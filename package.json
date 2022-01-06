@@ -2,7 +2,7 @@
     "name": "com.antonysze.custom-play-button",
     "version": "1.0.0",
     "displayName": "Custom Play Button",
-    "description": "Extend the Unity Toolbar with custom play button",
+    "description": "Extend the Unity Toolbar with custom play buttons.\n\nRequires:\n  unity-toolbar-extender\n  - https://github.com/marijnz/unity-toolbar-extender.git",
     "unity": "2019.1",
     "keywords": [
         "toolbar",
@@ -14,7 +14,7 @@
     "author": {
         "name": "Antony Sze",
         "email": "antonyszex@gmail.com",
-        "url": "https://twitter.com/Antony_Sze"
+        "url": "https://github.com/antonysze/"
     },
     "changelogUrl": "https://github.com/antonysze/Unity-Custom-Play-Button/blob/main/CHANGELOG.md",
     "licensesUrl": "https://github.com/antonysze/Unity-Custom-Play-Button/blob/main/LICENSE.md"
