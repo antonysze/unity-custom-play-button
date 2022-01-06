@@ -170,9 +170,9 @@ namespace ASze.CustomPlayButton
                 var inBookmark = bookmarks.Contains(scene);
                 GUIContent content;
                 if (inBookmark)
-                    content = EditorGUIUtility.IconContent("blendKeySelected", "Remove Bookmark");
+                    content = EditorGUIUtility.IconContent("blendKeySelected", "Unbookmark");
                 else
-                    content = EditorGUIUtility.IconContent("blendKeyOverlay", "Add Bookmark");
+                    content = EditorGUIUtility.IconContent("blendKeyOverlay", "Bookmark");
                 if (GUILayout.Button(content, buttonStyle, ICON_LAYOUT))
                 {
                     if (inBookmark)
@@ -189,7 +189,7 @@ namespace ASze.CustomPlayButton
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_winbtn_win_close", "Remove Bookmark"), buttonStyle, ICON_LAYOUT))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_winbtn_win_close", "Unbookmark"), buttonStyle, ICON_LAYOUT))
                 {
                     var bookmarks = CustomPlayButton.Bookmark.bookmarks;
                     bookmarks.Remove(scene);
