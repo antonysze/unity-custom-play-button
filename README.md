@@ -25,12 +25,12 @@ You can also install the prerequisite package via popup window after you install
 3. **Play game button** - play the game (the first scene in build setting)
 
 ### Scene selection window
-![image](https://user-images.githubusercontent.com/3353695/148315308-dc98f926-4faa-4a77-b58a-2409b8bf4a2d.png)
-1. Select custom scene (for **play custom scene button**)
-2. Bookmark/Unbookmark
-3. Open scene in scene view
-4. Select bookmark scriptable object
-5. Unbookmark
+![image](https://user-images.githubusercontent.com/3353695/148323734-6bc75ebb-a3f7-4791-a865-5da002d43d49.png)
+4. Select custom scene (for **play custom scene button**)
+5. Bookmark/Unbookmark
+6. Open scene in scene view
+7. Select bookmark scriptable object
+8. Unbookmark
 
 ### Scene Bookmark
 Please note that bookmark is stored in a bookmark scripable object in your project. Please add to .gitignore if you do not want to share it. This scriptable object will be automatucally created from `Assets/Editor/CustomPlayButton/BookmarkSetting.asset`. You can also edit or reorder the list of bookmarks by modifying the scripable object directly.
