@@ -1,9 +1,15 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityToolbarExtender;
 using System.IO;
 using System.Reflection;
+
+#if UNITY_TOOLBAR_EXTENDER
+using UnityToolbarExtender;
+#else
+using UnityEditor.PackageManager;
+using UnityEditor.PackageManager.Requests;
+#endif
 
 #if UNITY_2019_1_OR_NEWER
 using VisualElement = UnityEngine.UIElements.VisualElement;
@@ -16,6 +22,7 @@ namespace ASze.CustomPlayButton
     [InitializeOnLoad]
     public static class CustomPlayButton
     {
+#if UNITY_TOOLBAR_EXTENDER
         const string FOLDER_PATH = "Assets/Editor/CustomPlayButton/";
         const string SETTING_PATH = FOLDER_PATH + "BookmarkSetting.asset";
         const string ICONS_PATH = "Packages/com.antonysze.custom-play-button/Editor/Icons/";
@@ -73,7 +80,6 @@ namespace ASze.CustomPlayButton
 
             static ToolbarStyles()
             {
-                EditorApplication.playModeStateChanged -= HandleOnPlayModeChanged;
                 EditorApplication.playModeStateChanged += HandleOnPlayModeChanged;
                 commandButtonStyle = new GUIStyle("Command")
                 {
@@ -88,7 +94,6 @@ namespace ASze.CustomPlayButton
         static CustomPlayButton()
         {
             ToolbarExtender.LeftToolbarGUI.Add(OnToolbarLeftGUI);
-            EditorApplication.update -= OnUpdate;
             EditorApplication.update += OnUpdate;
 
             if (bookmark == null)
@@ -248,5 +253,33 @@ namespace ASze.CustomPlayButton
         {
             return (Texture2D)EditorGUIUtility.Load(ICONS_PATH + path);
         }
+#else
+        static AddRequest request;
+
+        static CustomPlayButton()
+        {
+            if (!EditorUtility.DisplayDialog(
+                "Cannot activate Custom Play Button",
+                "Prerequired package is needed for unity-custom-play-button.\nPlease install package unity-toolbar-extender from https://github.com/marijnz/unity-toolbar-extender.git",
+                "Ok", "Install package"))
+            {
+                request = Client.Add("https://github.com/marijnz/unity-toolbar-extender.git");
+                EditorApplication.update += Progress;
+            }
+        }
+
+        static void Progress()
+        {
+            if (request.IsCompleted)
+            {
+                if (request.Status == StatusCode.Success)
+                    Debug.Log("Installed: " + request.Result.packageId);
+                else if (request.Status >= StatusCode.Failure)
+                    Debug.Log(request.Error.message);
+
+                EditorApplication.update -= Progress;
+            }
+        }
+#endif
     }
 }

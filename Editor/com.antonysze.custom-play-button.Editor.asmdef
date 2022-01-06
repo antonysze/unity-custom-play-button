@@ -13,6 +13,12 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": [],
+    "versionDefines": [
+        {
+            "name": "com.marijnzwemmer.unity-toolbar-extender",
+            "expression": "1.4.1",
+            "define": "UNITY_TOOLBAR_EXTENDER"
+        }
+    ],
     "noEngineReferences": false
 }
