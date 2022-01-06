@@ -26,6 +26,7 @@ You can also install the prerequisite package via popup window after you install
 
 ### Scene selection window
 ![image](https://user-images.githubusercontent.com/3353695/148323734-6bc75ebb-a3f7-4791-a865-5da002d43d49.png)
+
 4. Select custom scene (for **play custom scene button**)
 5. Bookmark/Unbookmark
 6. Open scene in scene view
