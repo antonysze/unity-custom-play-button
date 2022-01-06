@@ -260,7 +260,7 @@ namespace ASze.CustomPlayButton
         {
             if (!EditorUtility.DisplayDialog(
                 "Cannot activate Custom Play Button",
-                "Prerequired package is needed for unity-custom-play-button.\nPlease install package unity-toolbar-extender from https://github.com/marijnz/unity-toolbar-extender.git",
+                "Prerequisite package is needed for \"unity-custom-play-button\".\nPlease install package \"unity-toolbar-extender\"(https://github.com/marijnz/unity-toolbar-extender.git).",
                 "Ok", "Install package"))
             {
                 request = Client.Add("https://github.com/marijnz/unity-toolbar-extender.git");
