@@ -9,8 +9,9 @@ namespace ASze.CustomPlayButton
     public class EditorSelectScenePopup : PopupWindowContent
     {
         const float COLLUMN_WIDTH = 200.0f;
+        const float ICON_SIZE = 20.0f;
         readonly GUILayoutOption[] ICON_LAYOUT = new GUILayoutOption[] {
-            GUILayout.Width(20.0f), GUILayout.Height(20.0f)
+            GUILayout.Width(ICON_SIZE), GUILayout.Height(ICON_SIZE)
         };
 
 
@@ -32,7 +33,6 @@ namespace ASze.CustomPlayButton
 
             GetBuildScenes();
             currentScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(EditorSceneManager.GetActiveScene().path);
-            CustomPlayButton.Bookmark.RemoveNullValue();
         }
 
         void InitStyles()
@@ -71,18 +71,10 @@ namespace ASze.CustomPlayButton
 
         public override Vector2 GetWindowSize()
         {
-            var width = COLLUMN_WIDTH * (CustomPlayButton.Bookmark.HasBookmark() ? 2 : 1);
-            var maxRow = Mathf.Max(buildScenes.Length, CustomPlayButton.Bookmark.bookmarks.Count, 1);
+            var width = COLLUMN_WIDTH * (SceneBookmark.HasBookmark() ? 2 : 1);
+            var maxRow = Mathf.Max(buildScenes.Length, SceneBookmark.Bookmarks.Count, 1);
             var height = Mathf.Min(22 * maxRow + 26, Screen.currentResolution.height * 0.5f);
             return new Vector2(width, height);
-        }
-
-        public override void OnClose()
-        {
-            if (EditorUtility.IsDirty(CustomPlayButton.Bookmark))
-            {
-                AssetDatabase.SaveAssets();
-            }
         }
 
         public override void OnGUI(Rect rect)
@@ -102,12 +94,11 @@ namespace ASze.CustomPlayButton
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Scenes in Build", EditorStyles.boldLabel, GUILayout.Height(20.0f));
-            if (!CustomPlayButton.Bookmark.HasBookmark())
+            if (!SceneBookmark.HasBookmark())
             {
-                GUILayout.FlexibleSpace();
-                if (GUILayout.Button(bookmarkContent, buttonStyle, ICON_LAYOUT))
+                if (GUILayout.Button(EditorGUIUtility.IconContent("blendKeySelected"), titleButtonStyle, ICON_LAYOUT))
                 {
-                    Selection.activeObject = CustomPlayButton.Bookmark;
+                    SceneBookmark.OpenBookmarkSettings();
                 }
             }
             EditorGUILayout.EndHorizontal();
@@ -130,90 +121,101 @@ namespace ASze.CustomPlayButton
 
         void DrawBookmarkScenes()
         {
-            var bookmarkSetting = CustomPlayButton.Bookmark;
-            if (!bookmarkSetting.HasBookmark()) return;
+            if (!SceneBookmark.HasBookmark()) return;
 
             EditorGUILayout.BeginVertical(GUILayout.MinWidth(COLLUMN_WIDTH));
 
             var content = new GUIContent(bookmarkContent);
-            content.text = "Bookmark";
+            content.text = " Bookmarks";
             if (GUILayout.Button(content, titleButtonStyle, GUILayout.Height(20.0f)))
             {
-                Selection.activeObject = CustomPlayButton.Bookmark;
+                SceneBookmark.OpenBookmarkSettings();
             }
 
 
             scrollPosBookmark = EditorGUILayout.BeginScrollView(scrollPosBookmark);
-            var bookmarks = new List<SceneAsset>(bookmarkSetting.bookmarks);
-            foreach (var bookmark in bookmarks)
+            var bookmarks = new List<SceneAsset>(SceneBookmark.Bookmarks);
+            for (int i = 0; i < bookmarks.Count; i++)
             {
-                DrawSelection(bookmark);
+                DrawSelection(bookmarks[i], i);
             }
+
             EditorGUILayout.EndScrollView();
             EditorGUILayout.EndVertical();
         }
 
         void DrawSelection(SceneAsset scene, int index = -1, bool bookmarkButton = false)
         {
-            if (scene == null) return;
-
             GUILayout.BeginHorizontal();
             var style = CustomPlayButton.SelectedScene == scene ? selectedButtonStyle : buttonStyle;
-            if (GUILayout.Button(index >= 0 ? $"{index}\t{scene.name}" : scene.name, style))
+            string sceneName = scene != null ? scene.name : "<NOT FOUND>";
+            if (GUILayout.Button(index >= 0 ? $"{index}\t{sceneName}" : sceneName, style))
             {
                 SelectScene(scene);
             }
 
-            if (bookmarkButton)
+            if (scene != null)
             {
-                var bookmarks = CustomPlayButton.Bookmark.bookmarks;
-                var inBookmark = bookmarks.Contains(scene);
-                GUIContent content;
-                if (inBookmark)
-                    content = EditorGUIUtility.IconContent("blendKeySelected", "Unbookmark");
-                else
-                    content = EditorGUIUtility.IconContent("blendKeyOverlay", "Bookmark");
-                if (GUILayout.Button(content, buttonStyle, ICON_LAYOUT))
+                 style = currentScene == scene ? selectedButtonStyle : buttonStyle;
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_BuildSettings.SelectedIcon", "Open Scene"), style, ICON_LAYOUT))
                 {
-                    if (inBookmark)
-                    {
-                        bookmarks.Remove(scene);
-                    }
-                    else
-                    {
-                        bookmarks.Add(scene);
-                    }
-                    bookmarks.RemoveAll(item => item == null);
-                    EditorUtility.SetDirty(CustomPlayButton.Bookmark);
+                    OpenScene(scene);
                 }
             }
             else
             {
-                if (GUILayout.Button(EditorGUIUtility.IconContent("d_winbtn_win_close", "Unbookmark"), buttonStyle, ICON_LAYOUT))
+                GUILayout.Space(ICON_SIZE);
+            }
+           
+
+            if (bookmarkButton)
+            {
+                if (scene != null)
                 {
-                    var bookmarks = CustomPlayButton.Bookmark.bookmarks;
-                    bookmarks.Remove(scene);
-                    bookmarks.RemoveAll(item => item == null);
-                    EditorUtility.SetDirty(CustomPlayButton.Bookmark);
+                    bool inBookmark = SceneBookmark.Bookmarks.Contains(scene);
+                    GUIContent content;
+                    if (inBookmark)
+                        content = EditorGUIUtility.IconContent("blendKeySelected", "Unbookmark");
+                    else
+                        content = EditorGUIUtility.IconContent("blendKeyOverlay", "Bookmark");
+                    if (GUILayout.Button(content, buttonStyle, ICON_LAYOUT))
+                    {
+                        if (inBookmark)
+                        {
+                            SceneBookmark.RemoveBookmark(scene);
+                        }
+                        else
+                        {
+                            SceneBookmark.AddBookmark(scene);
+                        }
+                    }
+                }
+                else
+                {
+                    GUILayout.Space(ICON_SIZE);
+                }
+            }
+            else
+            {
+                if (GUILayout.Button(EditorGUIUtility.IconContent("d_P4_DeletedLocal", "Unbookmark"), buttonStyle, ICON_LAYOUT))
+                {
+                    SceneBookmark.RemoveBookmarkAt(index);
                 }
             }
 
-            style = currentScene == scene ? selectedButtonStyle : buttonStyle;
-            if (GUILayout.Button(EditorGUIUtility.IconContent("d_BuildSettings.SelectedIcon", "Open Scene"), style, ICON_LAYOUT))
-            {
-                OpenScene(scene);
-            }
             GUILayout.EndHorizontal();
         }
 
         void SelectScene(SceneAsset scene)
         {
+            if (scene == null) return;
             CustomPlayButton.SelectedScene = scene;
             editorWindow.Close();
         }
 
         void OpenScene(SceneAsset scene)
         {
+            if (scene == null) return;
             if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
             {
                 var scenePath = AssetDatabase.GetAssetPath(scene);

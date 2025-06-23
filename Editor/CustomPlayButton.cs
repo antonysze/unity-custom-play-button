@@ -24,10 +24,8 @@ namespace ASze.CustomPlayButton
     {
 #if UNITY_TOOLBAR_EXTENDER
         const string FOLDER_PATH = "Assets/Editor/CustomPlayButton/";
-        const string SETTING_PATH = FOLDER_PATH + "BookmarkSetting.asset";
         const string ICONS_PATH = "Packages/com.antonysze.custom-play-button/Editor/Icons/";
 
-        private static SceneBookmark bookmark = null;
         private static SceneAsset selectedScene = null;
 
 
@@ -37,22 +35,6 @@ namespace ASze.CustomPlayButton
         static Rect buttonRect;
         static VisualElement toolbarElement;
         static SceneAsset lastScene = null;
-
-        public static SceneBookmark Bookmark
-        {
-            get
-            {
-                if (bookmark == null)
-                {
-                    bookmark = ScriptableObject.CreateInstance<SceneBookmark>();
-                    if (!Directory.Exists(FOLDER_PATH))
-                        Directory.CreateDirectory(FOLDER_PATH);
-                    AssetDatabase.CreateAsset(bookmark, SETTING_PATH);
-                    AssetDatabase.Refresh();
-                }
-                return bookmark;
-            }
-        }
 
         public static SceneAsset SelectedScene
         {
@@ -96,12 +78,6 @@ namespace ASze.CustomPlayButton
             ToolbarExtender.LeftToolbarGUI.Add(OnToolbarLeftGUI);
             EditorApplication.update += OnUpdate;
 
-            if (bookmark == null)
-            {
-                bookmark = AssetDatabase.LoadAssetAtPath<SceneBookmark>(SETTING_PATH);
-                Bookmark?.RemoveNullValue();
-            }
-
             var savedScenePath = EditorPrefs.GetString(GetEditorPrefKey(), "");
             selectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(savedScenePath);
             if (selectedScene == null && EditorBuildSettings.scenes.Length > 0)
@@ -120,6 +96,7 @@ namespace ASze.CustomPlayButton
 
             var sceneName = selectedScene != null ? selectedScene.name : "Select Scene...";
             var selected = EditorGUILayout.DropdownButton(new GUIContent(sceneName), FocusType.Passive, GUILayout.Width(128.0f));
+
             if (Event.current.type == EventType.Repaint)
             {
                 buttonRect = GUILayoutUtility.GetLastRect();
@@ -162,8 +139,6 @@ namespace ASze.CustomPlayButton
                     {
                         EditorWindow.GetWindow(System.Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
                     }
-                    // Avoid error from GUILayout.EndHorizontal()
-                    GUILayout.BeginHorizontal();
                 }
             }
         }
