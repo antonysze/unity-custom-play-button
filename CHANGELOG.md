@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-06-22
+### Changed
+- Support older version instead of only Unity 6
+- Add popup width to settings
+
 ## [1.1.0] - 2025-06-22
 ### Changed
 - Use editor preference setting to store bookmarks instead of ScriptableObject
