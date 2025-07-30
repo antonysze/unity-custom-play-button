@@ -1,3 +1,4 @@
+#if UNITY_TOOLBAR_EXTENDER && UNITY_6000_0_OR_NEWER
 using UnityEditor;
 using UnityEngine;
 using UnityEditorInternal; // Required for ReorderableList
@@ -7,14 +8,16 @@ using System.Linq;
 
 public class SceneListSettingsProvider : SettingsProvider
 {
+    private const string BOOKMARKS_SETTING_PATH = "Custom Play Button/Bookmarks";
     private ReorderableList reorderableList;
+    private float columnWidth;
 
     // Constructor required by SettingsProvider
     public SceneListSettingsProvider(string path, SettingsScope scopes = SettingsScope.Project)
         : base(path, scopes)
     {
     }
-
+    
     // This method is called when the provider is activated.
     // Use it to set up your ReorderableList.
     public override void OnActivate(string searchContext, UnityEngine.UIElements.VisualElement rootElement)
@@ -76,6 +79,8 @@ public class SceneListSettingsProvider : SettingsProvider
 
         // Set up height for each element
         reorderableList.elementHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+        columnWidth = EditorSelectScenePopup.GetColumnWidth();
     }
 
     // This method is called to draw the UI for your settings.
@@ -102,6 +107,13 @@ public class SceneListSettingsProvider : SettingsProvider
             }
         }
 
+        EditorGUI.BeginChangeCheck();
+        columnWidth = EditorGUILayout.FloatField("Popup Column Width", columnWidth);
+        if (EditorGUI.EndChangeCheck())
+        {
+            EditorSelectScenePopup.SaveColumnWidth(columnWidth);
+        }
+
         // Inform the user about persistence
         EditorGUILayout.HelpBox("Scene list changes are automatically saved to EditorPrefs.", MessageType.Info);
     }
@@ -118,4 +130,19 @@ public class SceneListSettingsProvider : SettingsProvider
         provider.keywords = new HashSet<string>(new[] { "Scene", "List", "Build", "Order", "Paths" });
         return provider;
     }
+
+#region Editor Menu
+    [SettingsProvider]
+    public static SettingsProvider CustomSettings_Bookmarks()
+    {
+        var provider = new SceneListSettingsProvider(BOOKMARKS_SETTING_PATH, SettingsScope.Project);
+        return provider;
+    }
+    
+    public static void OpenBookmarkSettings()
+    {
+        SettingsService.OpenProjectSettings(BOOKMARKS_SETTING_PATH);
+    }
+#endregion
 }
+#endif

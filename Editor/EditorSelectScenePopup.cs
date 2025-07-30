@@ -8,7 +8,8 @@ namespace ASze.CustomPlayButton
 {
     public class EditorSelectScenePopup : PopupWindowContent
     {
-        const float COLLUMN_WIDTH = 200.0f;
+        public const string EDITOR_COLUMN_WIDTH_PREF_KEY = "ASze.CustomPlayButton.columnWidth";
+        private const float DEFAULT_COLUMN_WIDTH = 200.0f;
         const float ICON_SIZE = 20.0f;
         readonly GUILayoutOption[] ICON_LAYOUT = new GUILayoutOption[] {
             GUILayout.Width(ICON_SIZE), GUILayout.Height(ICON_SIZE)
@@ -25,6 +26,8 @@ namespace ASze.CustomPlayButton
         Vector2 scrollPosBuild;
         Vector2 scrollPosBookmark;
 
+        private float collumnWidth;
+
         public EditorSelectScenePopup() : base()
         {
             InitStyles();
@@ -33,6 +36,8 @@ namespace ASze.CustomPlayButton
 
             GetBuildScenes();
             currentScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(EditorSceneManager.GetActiveScene().path);
+            
+            
         }
 
         void InitStyles()
@@ -71,7 +76,7 @@ namespace ASze.CustomPlayButton
 
         public override Vector2 GetWindowSize()
         {
-            var width = COLLUMN_WIDTH * (SceneBookmark.HasBookmark() ? 2 : 1);
+            var width = GetColumnWidth() * (SceneBookmark.HasBookmark() ? 2 : 1);
             var maxRow = Mathf.Max(buildScenes.Length, SceneBookmark.Bookmarks.Count, 1);
             var height = Mathf.Min(22 * maxRow + 26, Screen.currentResolution.height * 0.5f);
             return new Vector2(width, height);
@@ -94,13 +99,15 @@ namespace ASze.CustomPlayButton
 
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Scenes in Build", EditorStyles.boldLabel, GUILayout.Height(20.0f));
+#if UNITY_6000_0_OR_NEWER
             if (!SceneBookmark.HasBookmark())
             {
                 if (GUILayout.Button(EditorGUIUtility.IconContent("blendKeySelected"), titleButtonStyle, ICON_LAYOUT))
                 {
-                    SceneBookmark.OpenBookmarkSettings();
+                    SceneListSettingsProvider.OpenBookmarkSettings();
                 }
             }
+#endif
             EditorGUILayout.EndHorizontal();
 
             if (buildScenes.Length > 0)
@@ -123,15 +130,16 @@ namespace ASze.CustomPlayButton
         {
             if (!SceneBookmark.HasBookmark()) return;
 
-            EditorGUILayout.BeginVertical(GUILayout.MinWidth(COLLUMN_WIDTH));
+            EditorGUILayout.BeginVertical(GUILayout.MinWidth(GetColumnWidth()));
 
+#if UNITY_6000_0_OR_NEWER
             var content = new GUIContent(bookmarkContent);
             content.text = " Bookmarks";
             if (GUILayout.Button(content, titleButtonStyle, GUILayout.Height(20.0f)))
             {
-                SceneBookmark.OpenBookmarkSettings();
+                SceneListSettingsProvider.OpenBookmarkSettings();
             }
-
+#endif
 
             scrollPosBookmark = EditorGUILayout.BeginScrollView(scrollPosBookmark);
             var bookmarks = new List<SceneAsset>(SceneBookmark.Bookmarks);
@@ -237,6 +245,16 @@ namespace ASze.CustomPlayButton
                 if (scene != null) buildSceneList.Add(scene);
             }
             buildScenes = buildSceneList.ToArray();
+        }
+        
+        public static float GetColumnWidth()
+        {
+            return EditorPrefs.GetFloat(EDITOR_COLUMN_WIDTH_PREF_KEY, DEFAULT_COLUMN_WIDTH);
+        }
+
+        public static void SaveColumnWidth(float columnWidth)
+        {
+            EditorPrefs.SetFloat(EDITOR_COLUMN_WIDTH_PREF_KEY, columnWidth);
         }
     }
 }

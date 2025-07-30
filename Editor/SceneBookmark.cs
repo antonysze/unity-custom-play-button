@@ -1,3 +1,4 @@
+#if UNITY_TOOLBAR_EXTENDER
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -21,7 +22,6 @@ namespace ASze.CustomPlayButton
         }
 
         private const string EDITOR_PREF_KEY = "ASze.CustomPlayButton.SceneBookmark";
-        private const string BOOKMARKS_SETTING_PATH = "Custom Play Button/Bookmarks";
 
         private static List<SceneAsset> _bookmarks;
 
@@ -144,19 +144,6 @@ namespace ASze.CustomPlayButton
                 }
             }
         }
-
-        #region Editor Menu
-        [SettingsProvider]
-        public static SettingsProvider CustomSettings_Bookmarks()
-        {
-            var provider = new SceneListSettingsProvider(BOOKMARKS_SETTING_PATH, SettingsScope.Project);
-            return provider;
-        }
-        
-        public static void OpenBookmarkSettings()
-        {
-            SettingsService.OpenProjectSettings(BOOKMARKS_SETTING_PATH);
-        }
-#endregion
     }
 }
+#endif
