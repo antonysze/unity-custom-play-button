@@ -1,4 +1,4 @@
-#if UNITY_TOOLBAR_EXTENDER && UNITY_6000_0_OR_NEWER
+#if (UNITY_TOOLBAR_EXTENDER && UNITY_6000_0_OR_NEWER) || UNITY_6000_3_OR_NEWER
 using UnityEditor;
 using UnityEngine;
 using UnityEditorInternal; // Required for ReorderableList

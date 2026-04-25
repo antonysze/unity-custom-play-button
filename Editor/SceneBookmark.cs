@@ -1,4 +1,4 @@
-#if UNITY_TOOLBAR_EXTENDER
+#if UNITY_TOOLBAR_EXTENDER || UNITY_6000_3_OR_NEWER
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
@@ -104,10 +104,15 @@ namespace ASze.CustomPlayButton
         {
             if (_bookmarks != null)
             {
+#if UNITY_6000_3_OR_NEWER
+                NativeArray<EntityId> instanceIDs = new NativeArray<EntityId>(_bookmarks.Select(b => b?.GetEntityId() ?? 0).ToArray(), Allocator.TempJob);
+                NativeArray<GUID> guids = new NativeArray<GUID>(instanceIDs.Length, Allocator.TempJob);
+                AssetDatabase.EntityIdsToGUIDs(instanceIDs, guids);
+#else
                 NativeArray<int> instanceIDs = new NativeArray<int>(_bookmarks.Select(b => b?.GetInstanceID() ?? 0).ToArray(), Allocator.TempJob);
                 NativeArray<GUID> guids = new NativeArray<GUID>(instanceIDs.Length, Allocator.TempJob);
-
                 AssetDatabase.InstanceIDsToGUIDs(instanceIDs, guids);
+#endif
 
                 if (guids != null && guids.Length > 0)
                 {

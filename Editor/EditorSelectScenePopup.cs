@@ -1,8 +1,9 @@
-#if UNITY_TOOLBAR_EXTENDER
+#if UNITY_TOOLBAR_EXTENDER || UNITY_6000_3_OR_NEWER
 using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using System.Collections.Generic;
+using PlayButton = ASze.CustomPlayButton.CustomPlayButtonCore;
 
 namespace ASze.CustomPlayButton
 {
@@ -155,7 +156,7 @@ namespace ASze.CustomPlayButton
         void DrawSelection(SceneAsset scene, int index = -1, bool bookmarkButton = false)
         {
             GUILayout.BeginHorizontal();
-            var style = CustomPlayButton.SelectedScene == scene ? selectedButtonStyle : buttonStyle;
+            var style = PlayButton.SelectedScene == scene ? selectedButtonStyle : buttonStyle;
             string sceneName = scene != null ? scene.name : "<NOT FOUND>";
             if (GUILayout.Button(index >= 0 ? $"{index}\t{sceneName}" : sceneName, style))
             {
@@ -217,7 +218,7 @@ namespace ASze.CustomPlayButton
         void SelectScene(SceneAsset scene)
         {
             if (scene == null) return;
-            CustomPlayButton.SelectedScene = scene;
+            PlayButton.SelectedScene = scene;
             editorWindow.Close();
         }
 

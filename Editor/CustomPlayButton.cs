@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿// Unity 6000.3 is the first version that supports the MainToolbar API
+// CustomPlayButtonMainToolbar.cs is used for Unity 6000.3 and above
+#if !UNITY_6000_3_OR_NEWER
+
+using UnityEngine;
 using UnityEditor;
-using UnityEditor.SceneManagement;
-using System.IO;
 using System.Reflection;
 
 #if UNITY_TOOLBAR_EXTENDER
@@ -23,78 +25,41 @@ namespace ASze.CustomPlayButton
     public static class CustomPlayButton
     {
 #if UNITY_TOOLBAR_EXTENDER
-        const string FOLDER_PATH = "Assets/Editor/CustomPlayButton/";
-        const string ICONS_PATH = "Packages/com.antonysze.custom-play-button/Editor/Icons/";
-
-        private static SceneAsset selectedScene = null;
-
-
         static GUIContent customSceneContent;
         static GUIContent gameSceneContent;
 
         static Rect buttonRect;
         static VisualElement toolbarElement;
-        static SceneAsset lastScene = null;
-
-        public static SceneAsset SelectedScene
-        {
-            get { return selectedScene; }
-            set
-            {
-                selectedScene = value;
-                toolbarElement?.MarkDirtyRepaint();
-
-                if (value != null)
-                {
-                    var path = AssetDatabase.GetAssetPath(value);
-                    EditorPrefs.SetString(GetEditorPrefKey(), path);
-                }
-                else
-                {
-                    EditorPrefs.DeleteKey(GetEditorPrefKey());
-                }
-            }
-        }
 
         static class ToolbarStyles
         {
-            public static readonly GUIStyle commandButtonStyle;
-
-            static ToolbarStyles()
+            public static readonly GUIStyle commandButtonStyle = new GUIStyle("Command")
             {
-                EditorApplication.playModeStateChanged += HandleOnPlayModeChanged;
-                commandButtonStyle = new GUIStyle("Command")
-                {
-                    fontSize = 16,
-                    alignment = TextAnchor.MiddleCenter,
-                    imagePosition = ImagePosition.ImageAbove,
-                    fontStyle = FontStyle.Bold
-                };
-            }
+                fontSize = 16,
+                alignment = TextAnchor.MiddleCenter,
+                imagePosition = ImagePosition.ImageAbove,
+                fontStyle = FontStyle.Bold,
+            };
         }
 
         static CustomPlayButton()
         {
             ToolbarExtender.LeftToolbarGUI.Add(OnToolbarLeftGUI);
-            EditorApplication.update += OnUpdate;
+            EditorApplication.update += FindToolbarElement;
+            CustomPlayButtonCore.SelectedSceneChanged += () => toolbarElement?.MarkDirtyRepaint();
 
-            var savedScenePath = EditorPrefs.GetString(GetEditorPrefKey(), "");
-            selectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(savedScenePath);
-            if (selectedScene == null && EditorBuildSettings.scenes.Length > 0)
-            {
-                var scenePath = EditorBuildSettings.scenes[0].path;
-                SelectedScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
-            }
-
-            customSceneContent = CreateIconContent("PlaySceneButton.png", "d_UnityEditor.Timeline.TimelineWindow@2x", "Play Custom Scene");
-            gameSceneContent = CreateIconContent("PlayGameButton.png", "d_UnityEditor.GameView@2x", "Play Game Scene");
+            customSceneContent = CustomPlayButtonCore.CreateIconContent(
+                "PlaySceneButton.png", "d_UnityEditor.Timeline.TimelineWindow@2x", "Play Custom Scene");
+            gameSceneContent = CustomPlayButtonCore.CreateIconContent(
+                "PlayGameButton.png", "d_UnityEditor.GameView@2x", "Play Game Scene");
         }
 
         static void OnToolbarLeftGUI()
         {
             GUILayout.FlexibleSpace();
 
-            var sceneName = selectedScene != null ? selectedScene.name : "Select Scene...";
+            var scene = CustomPlayButtonCore.SelectedScene;
+            var sceneName = scene != null ? scene.name : "Select Scene...";
             var selected = EditorGUILayout.DropdownButton(new GUIContent(sceneName), FocusType.Passive, GUILayout.Width(128.0f));
 
             if (Event.current.type == EventType.Repaint)
@@ -109,124 +74,38 @@ namespace ASze.CustomPlayButton
 
             if (GUILayout.Button(customSceneContent, ToolbarStyles.commandButtonStyle))
             {
-                if (selectedScene != null)
-                {
-                    StartScene(selectedScene);
-                }
-                else
-                {
-                    EditorUtility.DisplayDialog(
-                        "Cannot play custom scene",
-                        "No scene is selected to play. Please select a scene from the dropdown list.",
-                        "Ok");
-                }
+                CustomPlayButtonCore.PlayCustomScene();
             }
 
             if (GUILayout.Button(gameSceneContent, ToolbarStyles.commandButtonStyle))
             {
-                if (EditorBuildSettings.scenes.Length > 0)
-                {
-                    var scenePath = EditorBuildSettings.scenes[0].path;
-                    var scene = AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath);
-                    StartScene(scene);
-                }
-                else
-                {
-                    if (!EditorUtility.DisplayDialog(
-                        "Cannot play the game",
-                        "Please add the first scene in build setting in order to play the game.",
-                        "Ok", "Open build setting"))
-                    {
-                        EditorWindow.GetWindow(System.Type.GetType("UnityEditor.BuildPlayerWindow,UnityEditor"));
-                    }
-                }
+                CustomPlayButtonCore.PlayGameScene();
             }
         }
 
-        static void StartScene(SceneAsset scene)
+        static void FindToolbarElement()
         {
-            if (EditorApplication.isPlaying)
-            {
-                lastScene = scene;
-                EditorApplication.isPlaying = false;
-            }
-            else
-            {
-                ChangeScene(scene);
-            }
-        }
+            if (toolbarElement != null) return;
 
-        static void OnUpdate()
-        {
-            // Get toolbar element for repainting
-            if (toolbarElement == null)
-            {
-                var toolbarType = typeof(Editor).Assembly.GetType("UnityEditor.Toolbar");
-                var toolbars = Resources.FindObjectsOfTypeAll(toolbarType);
-                var currentToolbar = toolbars.Length > 0 ? (ScriptableObject)toolbars[0] : null;
-                if (currentToolbar != null)
-                {
-                    var guiViewType = typeof(Editor).Assembly.GetType("UnityEditor.GUIView");
+            var toolbarType = typeof(Editor).Assembly.GetType("UnityEditor.Toolbar");
+            var toolbars = Resources.FindObjectsOfTypeAll(toolbarType);
+            var currentToolbar = toolbars.Length > 0 ? (ScriptableObject)toolbars[0] : null;
+            if (currentToolbar == null) return;
+
+            var guiViewType = typeof(Editor).Assembly.GetType("UnityEditor.GUIView");
 #if UNITY_2020_1_OR_NEWER
-                    var iWindowBackendType = typeof(Editor).Assembly.GetType("UnityEditor.IWindowBackend");
-                    var guiBackend = guiViewType.GetProperty("windowBackend",
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    var viewVisualTree = iWindowBackendType.GetProperty("visualTree",
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    var windowBackend = guiBackend.GetValue(currentToolbar);
-                    toolbarElement = (VisualElement)viewVisualTree.GetValue(windowBackend, null);
+            var iWindowBackendType = typeof(Editor).Assembly.GetType("UnityEditor.IWindowBackend");
+            var guiBackend = guiViewType.GetProperty("windowBackend",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var viewVisualTree = iWindowBackendType.GetProperty("visualTree",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            var windowBackend = guiBackend.GetValue(currentToolbar);
+            toolbarElement = (VisualElement)viewVisualTree.GetValue(windowBackend, null);
 #else
-                    var viewVisualTree = guiViewType.GetProperty("visualTree",
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                    toolbarElement = (VisualElement)viewVisualTree.GetValue(currentToolbar, null);
+            var viewVisualTree = guiViewType.GetProperty("visualTree",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            toolbarElement = (VisualElement)viewVisualTree.GetValue(currentToolbar, null);
 #endif
-                }
-            }
-
-            if (lastScene == null ||
-                EditorApplication.isPlaying || EditorApplication.isPaused ||
-                EditorApplication.isCompiling || EditorApplication.isPlayingOrWillChangePlaymode)
-            {
-                return;
-            }
-
-            ChangeScene(lastScene);
-            lastScene = null;
-        }
-
-        static void ChangeScene(SceneAsset scene)
-        {
-            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
-            {
-                EditorSceneManager.playModeStartScene = scene;
-                EditorApplication.isPlaying = true;
-            }
-        }
-
-        static void HandleOnPlayModeChanged(PlayModeStateChange playMode)
-        {
-            if (playMode == PlayModeStateChange.ExitingPlayMode)
-            {
-                EditorSceneManager.playModeStartScene = null;
-            }
-        }
-
-        public static string GetEditorPrefKey()
-        {
-            var projectPrefix = PlayerSettings.companyName + "." + PlayerSettings.productName;
-            return projectPrefix + "_CustomPlayButton_SelectedScenePath";
-        }
-
-        public static GUIContent CreateIconContent(string localTex, string builtInTex, string tooltip)
-        {
-            var tex = LoadTexture(localTex);
-            if (tex != null) return new GUIContent(tex, tooltip);
-            else return EditorGUIUtility.IconContent(builtInTex, tooltip);
-        }
-
-        public static Texture2D LoadTexture(string path)
-        {
-            return (Texture2D)EditorGUIUtility.Load(ICONS_PATH + path);
         }
 #else
         static AddRequest request;
@@ -258,3 +137,5 @@ namespace ASze.CustomPlayButton
 #endif
     }
 }
+
+#endif
